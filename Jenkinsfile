@@ -7,23 +7,30 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Install Dependencies') {
-            steps {
-                sh 'pip install -r requirements.txt'
-            }
-        }
-        stage('Run Tests With Coverage') {
+
+        stage('Setup Virtual Environment') {
             steps {
                 sh '''
+                    python3 -m venv venv
                     . venv/bin/activate
-                    pytest --cov=src --cov-report=xml --cov-report=term
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
                 '''
             }
         }
 
+        stage('Run Tests With Coverage') {
+            steps {
+                sh '''
+                    . venv/bin/activate
+                    pytest --cov=. --cov-report=xml --cov-report=term
+                '''
+            }
+        }
     }
+
     post {
-        success { echo 'build succeded!' }
-        failure { echo 'build failed!'}
+        success { echo 'build succeeded!' }
+        failure { echo 'build failed!' }
     }
 }
