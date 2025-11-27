@@ -12,11 +12,15 @@ pipeline {
                 sh 'pip install -r requirements.txt'
             }
         }
-        stage('Run tests') {
+        stage('Run Tests With Coverage') {
             steps {
-                sh 'pytest'
+                sh '''
+                    . venv/bin/activate
+                    pytest --cov=src --cov-report=xml --cov-report=term
+                '''
             }
         }
+
     }
     post {
         success { echo 'build succeded!' }
